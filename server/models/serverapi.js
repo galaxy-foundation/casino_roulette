@@ -3,7 +3,7 @@ const mocUsers = {
       "username": 1000000,
       "king": 2000000
     }
-};
+}
 
 
 const isValidToken = async (token) => {
