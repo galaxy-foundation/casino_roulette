@@ -1,19 +1,37 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 import wheelImage from "../style/img/wheel.png"
 import rulewheel from "../style/img/rulewheel.png";
 
 import $ from "jquery";
+import { set } from "mongoose";
 
 function Wheel({
     spinState,
     currentLength
 }) {
+
+    const [rotateLength, setRotateLength] = useState(0);
+    const [rNum,setRNum] = useState(0);
+
+    function getRandom() {
+        var _rNum =rNum + 2
+        //  Math.floor(rNum+ Math.random() * 5 + 3);
+        setRNum(_rNum);
+        return _rNum;
+    }
+
+    useEffect(() => {
+        console.log("currentLength",currentLength)
+        setRotateLength(360 * getRandom() - (360 / 37) * currentLength);
+        // * getRandom() 
+    }, [currentLength]);
+
     useEffect(() => {
         if (spinState === true) {
-            $(".wheel").css("transform", "rotate(" + currentLength + "deg)");
+            $(".wheel").css("transform", "rotate(" + rotateLength + "deg)");
         }
-    }, [currentLength]);
+    }, [rotateLength]);
 
     return (
         <div className="noselect">

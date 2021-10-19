@@ -1,5 +1,6 @@
-const {isValidToken} = require('../models/serverapi')
+const { isValidToken } = require('../models/serverapi')
 
+const patternNum = [0, 32, 15, 19, 4, 21, 2, 25, 17, 34, 6, 27, 13, 36, 11, 30, 8, 23, 10, 5, 24, 16, 33, 1, 20, 14, 31, 9, 22, 18, 29, 7, 28, 12, 35, 3, 26];
 const OtherBetSet = {
     "dozen1": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
     "dozen2": [13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24],
@@ -14,49 +15,30 @@ const OtherBetSet = {
     "half1": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18],
     "half2": [19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36],
 }
-
-const values = [
-    "hlaf1",
-    "hlaf2",
-    "red",
-    "black",
-    "even",
-    "odd",
-];
+const values = [ "hlaf1", "hlaf2", "red", "black", "even", "odd" ];
 
 const usersPoints = {}
 
-function getRandomInt(min, max) {
-    return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
 function rotateValue(user) {
-    const randomInterval = getRandomInt(0, 37) * (360 / 37) + getRandomInt(3, 4) * 360;
-    user.currentLength += randomInterval;
-    totAngle = (totAngle + randomInterval) % 360;
-    
-    var x = 360 - totAngle;
-    for (var i = 0; i < 37; i++) {
-        if (x >= i * Math.floor((360 / 37)) && x <= (i + 1) * Math.ceil((360 / 37))) {
-            user.patternNum[i];
-            break;
-        }
-    }
+    var randomNum = Math.floor(Math.random() * 37);
+    user.spinResult = patternNum[randomNum];
+    user.rotateNum = randomNum;
+    console.log(user.spinResult);
 }
 
 function calcMatch(user, betValue) {
-    for(let i in betValue) {
-        const key = keys[i];
+    for (let i in betValue) {
+        const key = i;
         const value = betValue[key];
         if (value > 0) {
             if (!isNaN(key)) {
                 let k = Number(key)
-                if (k>=0 && k<=36 && k === spinResult) {
+                if (k >= 0 && k <= 36 && k === user.spinResult) {
                     user.totalMoney += value * 36;
                 }
             } else {
-                if (OtherBetSet[key].indexOf(spinResult)!==-1) {
-                    const cofficient = values.indexOf(key)!==-1 ? 2 : 3;
+                if (OtherBetSet[key].indexOf(user.spinResult) !== -1) {
+                    const cofficient = values.indexOf(key) !== -1 ? 2 : 3;
                     user.totalMoney += value * cofficient;
                 }
             }
@@ -68,25 +50,24 @@ function calcMatch(user, betValue) {
 module.exports = {
     startSignal: async (req, res) => {
         try {
-            const {token, betValue} = req.body;
+            const { token, betValue } = req.body;
             const valid = await isValidToken(token);
             if (valid) {
                 let user = usersPoints[token];
-                if (user===undefined) {
+                if (user === undefined) {
                     usersPoints[token] = {
                         totalMoney: 0,
-                        totAngle: 0,
-                        currentLength: (1 / 37) * 360,
                         spinResult: 0,
+                        rotateNum: 0
                     };
                     user = usersPoints[token];
                 }
                 rotateValue(user);
                 calcMatch(user, betValue);
+                console.log("user.rotateNum",user.rotateNum);
                 res.json({
                     status: 'ok',
-                    rotateLength: currentLength,
-                    numResult: user.spinResult,
+                    rotateNum: user.rotateNum,
                     moneyResult: user.totalMoney
                 });
             } else {

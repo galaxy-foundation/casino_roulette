@@ -47,10 +47,13 @@ function Spin({
             };
             Action.send(sendingData)
                 .then(res => {
-                    setCurrentLength(res.data.rotateLength);
-                    setReachMoney(res.data.moneyResult);
-
-                    console.log(res.data.numResult);
+                    if (res.data.status == "ok") {
+                        setCurrentLength(res.data.rotateNum);
+                        setReachMoney(res.data.moneyResult);
+                    } else {
+                        console.log(res.data.message);
+                    }
+                    console.log(res.data.rotateNum);
                     console.log(res.data.moneyResult);
                 })
                 .catch(e => {

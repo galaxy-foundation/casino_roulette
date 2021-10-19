@@ -1,7 +1,7 @@
 import http from "../services/http-common";
 
 const send = (data) => {
-  return http.post("/startSignal", data);
+  return http.post("/start-signal", data);
 };
 
 const Action = {
